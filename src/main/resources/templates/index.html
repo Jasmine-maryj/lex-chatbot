@@ -1,10 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>ChatBot</title>
+    <script th:src="|https://code.jquery.com/jquery-1.12.4.min.js|"></script>
+    <style language="text/css">
+        input#wisdom {
+            padding: 4px;
+            font-size: 1em;
+            width: 400px;
+        }
+        input::placeholder {
+            color: #ccc;
+            font-style: italic;
+        }
+
+        p.userRequest {
+            margin: 4px;
+            padding: 4px 10px 4px 10px;
+            border-radius: 4px;
+            min-width: 50%;
+            max-width: 85%;
+            float: left;
+            background-color: #7d7;
+        }
+
+        p.lexResponse {
+            margin: 4px;
+            padding: 4px 10px 4px 10px;
+            border-radius: 4px;
+            text-align: right;
+            min-width: 50%;
+            max-width: 85%;
+            float: right;
+            background-color: #bbf;
+            font-style: italic;
+        }
+
+        p.lexError {
+            margin: 4px;
+            padding: 4px 10px 4px 10px;
+            border-radius: 4px;
+            text-align: right;
+            min-width: 50%;
+            max-width: 85%;
+            float: right;
+            background-color: #f77;
+        }
+    </style>
 </head>
 <body>
+<div id="conversation"></div>
+<input type="text" id="wisdom" />
+<button onclick="pushChat()">Send</button>
+
+<script>
+    var g_text = "";
+
+    function pushChat() {
+      var wisdomText = document.getElementById('wisdom').value.trim();
+      if (wisdomText.length > 0) {
+        // Disable input to show we're sending it
+        document.getElementById('wisdom').value = '...';
+        document.getElementById('wisdom').disabled = true;
+        handletext(wisdomText);
+      }
+    }
+
+    function showRequest(daText) {
+      var conversationDiv = document.getElementById('conversation');
+      var requestPara = document.createElement("p");
+      requestPara.className = 'userRequest';
+      requestPara.appendChild(document.createTextNode(daText));
+      conversationDiv.appendChild(requestPara);
+      conversationDiv.scrollTop = conversationDiv.scrollHeight;
+    }
+
+    function showResponse(lexResponse) {
+      var conversationDiv = document.getElementById('conversation');
+      var responsePara = document.createElement("p");
+      responsePara.className = 'lexResponse';
+      responsePara.appendChild(document.createTextNode(lexResponse));
+      conversationDiv.appendChild(responsePara);
+      conversationDiv.scrollTop = conversationDiv.scrollHeight;
+    }
+
+    function handletext(text) {
+      g_text = text;
+      $.ajax('/text', {
+        type: 'POST',
+        data: 'text=' + text,
+        success: function (data, status, xhr) {
+          showRequest(text);
+          showResponse(data);
+
+          // Re-enable input
+          document.getElementById('wisdom').value = '';
+          document.getElementById('wisdom').disabled = false;
+        },
+        error: function (jqXhr, textStatus, errorMessage) {
+          showResponse('Error: ' + errorMessage);
+          // Re-enable input even on error
+          document.getElementById('wisdom').disabled = false;
+        }
+      });
+    }
+  </script>
 
 </body>
 </html>
