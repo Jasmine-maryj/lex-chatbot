@@ -35,7 +35,7 @@ cd lex-chatbot-spring-boot
   ```
 3. Run the application:
    ```bash
-   java -jar target/lex-chatbot-spring-boot-1.0.jar
+   java -jar target/springchabot-0.0.1-SNAPSHOT.jar
    ```
 ## Configuration
 Before running the application, you need to configure AWS credentials and the Lex Bot details. You can do this by modifying the application.properties file:
